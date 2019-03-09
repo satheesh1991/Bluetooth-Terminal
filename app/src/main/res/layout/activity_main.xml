@@ -13,6 +13,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:visibility="gone"
         android:layout_toLeftOf="@+id/send"
         android:layout_toStartOf="@+id/send"
         android:imeOptions="actionSend"/>
@@ -23,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/message"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
@@ -31,7 +33,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
-        android:layout_above="@+id/message"
+        android:layout_above="@+id/send"
         android:layout_alignRight="@+id/send"
         android:layout_alignEnd="@+id/send"
         android:layout_alignParentTop="true"

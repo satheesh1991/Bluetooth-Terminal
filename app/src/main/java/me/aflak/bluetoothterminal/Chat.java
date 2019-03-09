@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.SmsManager;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
@@ -32,12 +34,13 @@ import me.aflak.bluetooth.Bluetooth;
 public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCallback {
     private String name;
     private Bluetooth b;
-    private EditText message;
     private Button send;
     private TextView text;
     private ScrollView scrollView;
     private boolean registered = false;
     MqttHelper mqttHelper;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +48,10 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         setContentView(R.layout.activity_main);
 
         text = (TextView) findViewById(R.id.text);
-        message = (EditText) findViewById(R.id.message);
         send = (Button) findViewById(R.id.send);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
 
         text.setMovementMethod(new ScrollingMovementMethod());
-        send.setEnabled(false);
 
         b = new Bluetooth(this);
         b.enableBluetooth();
@@ -66,10 +67,9 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String msg = message.getText().toString();
-                message.setText("");
-                b.send(msg);
-                Display("You: " + msg);
+                Intent i = new Intent(Chat.this,mapactivity.class);
+                startActivity(i);
+
             }
         });
 
@@ -151,6 +151,7 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         b.connectToDevice(device);
     }
 
+    int heartRate = 0;
     @Override
     public void onMessage(String message) {
         try {
@@ -158,7 +159,49 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         } catch (MqttException e) {
             e.printStackTrace();
         }
+
+        heartRate = Integer.valueOf(message.replace("Heart rate: ",""));
         Display(name + ": " + message);
+        decide();
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isserious = false;
+        isCritical = false;
+    }
+
+    boolean isserious = false;
+    boolean isCritical = false;
+    void decide(){
+        if(heartRate > 90 && !isserious ) {
+            // serious
+            isserious = true;
+            Intent i = new Intent(Chat.this,mapactivity.class);
+            startActivity(i);
+
+        } else if(heartRate > 120 && !isCritical) {
+            // critical
+            isCritical = true;
+            SmsManager sms=SmsManager.getDefault();
+            sms.sendTextMessage("9443713612", null,"your driver is in critical condition ", null,null);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "Message Sent successfully!",
+                            Toast.LENGTH_LONG).show();
+
+                }
+            });
+
+        }
     }
 
     @Override

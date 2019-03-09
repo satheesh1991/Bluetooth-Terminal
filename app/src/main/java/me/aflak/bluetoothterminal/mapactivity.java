@@ -142,10 +142,10 @@ public class mapactivity extends AppCompatActivity implements LocationListener {
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                         Uri.parse("http://maps.google.com/maps?directionsmode=driving&daddr=" + latitude + "," + longitude));
                 startActivity(intent);
-                Toast.makeText(getBaseContext(), jsonArray.length() + " Supermarkets found!",
+                Toast.makeText(getBaseContext(), jsonArray.length() + " Hospitals found!",
                         Toast.LENGTH_LONG).show();
             } else if (result.getString(STATUS).equalsIgnoreCase(ZERO_RESULTS)) {
-                Toast.makeText(getBaseContext(), "No Supermarket found in 5KM radius!!!",
+                Toast.makeText(getBaseContext(), "No Hospital found in 5KM radius!!!",
                         Toast.LENGTH_LONG).show();
             }
 

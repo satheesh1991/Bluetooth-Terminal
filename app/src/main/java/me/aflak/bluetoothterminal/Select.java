@@ -80,7 +80,7 @@ public class Select extends Activity implements PullToRefresh.OnRefreshListener 
                 //Get the SmsManager instance and call the sendTextMessage method to send message
                 SmsManager sms=SmsManager.getDefault();
                 sms.sendTextMessage("9443713612 " +
-                        "", null,"hello", pi,null);
+                        "", null,"hello", null,null);
 
                 Toast.makeText(getApplicationContext(), "Message Sent successfully!",
                         Toast.LENGTH_LONG).show();
