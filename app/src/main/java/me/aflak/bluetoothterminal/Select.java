@@ -35,9 +35,7 @@ public class Select extends Activity implements PullToRefresh.OnRefreshListener 
     private Bluetooth bt;
     private ListView listView;
     private Button not_found;
-    private Button near_by;
-    private Button route;
-    private Button sms;
+
     private List<BluetoothDevice> paired;
     private PullToRefresh pull_to_refresh;
     private boolean registered=false;
@@ -57,44 +55,9 @@ public class Select extends Activity implements PullToRefresh.OnRefreshListener 
                     new String[]{Manifest.permission.SEND_SMS},
                     0   );
         }
-        near_by = (Button) findViewById(R.id.near_by_button);
-        near_by.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent i = new Intent(Select.this,mapactivity.class);
-                startActivity(i);
-            }
-
-        });
-        sms=(Button)findViewById((R.id.sms));
-
-        sms.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
 
 
-                //Getting intent and PendingIntent instance
-                Intent intent=new Intent(getApplicationContext(),Select.class);
-                PendingIntent pi=PendingIntent.getActivity(getApplicationContext(), 0, intent,0);
 
-                //Get the SmsManager instance and call the sendTextMessage method to send message
-                SmsManager sms=SmsManager.getDefault();
-                sms.sendTextMessage("9443713612 " +
-                        "", null,"hello", null,null);
-
-                Toast.makeText(getApplicationContext(), "Message Sent successfully!",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-        route = (Button) findViewById(R.id.rt);
-        route.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                        Uri.parse("http://maps.google.com/maps?daddr=8.196300,77.443873"));
-                startActivity(intent);
-            }
-
-        });
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         registered=true;
