@@ -5,4 +5,5 @@
     <string name="action_settings">Settings</string>
 
     <color name="bg">#C0C0C0</color>
+    <string name="title_activity_mapactivity">mapactivity</string>
 </resources>

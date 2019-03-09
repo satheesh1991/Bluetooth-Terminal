@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,6 +21,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import me.aflak.bluetooth.Bluetooth;
 
@@ -30,16 +36,17 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
     private Button send;
     private TextView text;
     private ScrollView scrollView;
-    private boolean registered=false;
+    private boolean registered = false;
+    MqttHelper mqttHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        text = (TextView)findViewById(R.id.text);
-        message = (EditText)findViewById(R.id.message);
-        send = (Button)findViewById(R.id.send);
+        text = (TextView) findViewById(R.id.text);
+        message = (EditText) findViewById(R.id.message);
+        send = (Button) findViewById(R.id.send);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
 
         text.setMovementMethod(new ScrollingMovementMethod());
@@ -62,21 +69,22 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
                 String msg = message.getText().toString();
                 message.setText("");
                 b.send(msg);
-                Display("You: "+msg);
+                Display("You: " + msg);
             }
         });
 
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
-        registered=true;
+        registered = true;
+        startMqtt();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(registered) {
+        if (registered) {
             unregisterReceiver(mReceiver);
-            registered=false;
+            registered = false;
         }
     }
 
@@ -115,7 +123,7 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         }
     }
 
-    public void Display(final String s){
+    public void Display(final String s) {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -127,7 +135,7 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
 
     @Override
     public void onConnect(BluetoothDevice device) {
-        Display("Connected to "+device.getName()+" - "+device.getAddress());
+        Display("Connected to " + device.getName() + " - " + device.getAddress());
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -145,17 +153,22 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
 
     @Override
     public void onMessage(String message) {
-        Display(name+": "+message);
+        try {
+            mqttHelper.mqttAndroidClient.publish("home/garden/fountain", new MqttMessage(message.getBytes()));
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+        Display(name + ": " + message);
     }
 
     @Override
     public void onError(String message) {
-        Display("Error: "+message);
+        Display("Error: " + message);
     }
 
     @Override
     public void onConnectError(final BluetoothDevice device, String message) {
-        Display("Error: "+message);
+        Display("Error: " + message);
         Display("Trying again in 3 sec.");
         runOnUiThread(new Runnable() {
             @Override
@@ -182,17 +195,17 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
 
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
-                        if(registered) {
+                        if (registered) {
                             unregisterReceiver(mReceiver);
-                            registered=false;
+                            registered = false;
                         }
                         startActivity(intent1);
                         finish();
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
-                        if(registered) {
+                        if (registered) {
                             unregisterReceiver(mReceiver);
-                            registered=false;
+                            registered = false;
                         }
                         startActivity(intent1);
                         finish();
@@ -201,4 +214,30 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
             }
         }
     };
+
+    private void startMqtt() {
+        mqttHelper = new MqttHelper(getApplicationContext());
+        mqttHelper.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean b, String s) {
+
+            }
+
+            @Override
+            public void connectionLost(Throwable throwable) {
+
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+                Log.w("Debug", mqttMessage.toString());
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+
+            }
+        });
+
+    }
 }

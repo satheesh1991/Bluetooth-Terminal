@@ -1,13 +1,20 @@
 package me.aflak.bluetoothterminal;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,6 +35,9 @@ public class Select extends Activity implements PullToRefresh.OnRefreshListener 
     private Bluetooth bt;
     private ListView listView;
     private Button not_found;
+    private Button near_by;
+    private Button route;
+    private Button sms;
     private List<BluetoothDevice> paired;
     private PullToRefresh pull_to_refresh;
     private boolean registered=false;
@@ -36,7 +46,55 @@ public class Select extends Activity implements PullToRefresh.OnRefreshListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.SEND_SMS)) {
+            } else {
+            }
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},
+                    0   );
+        }
+        near_by = (Button) findViewById(R.id.near_by_button);
+        near_by.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent i = new Intent(Select.this,mapactivity.class);
+                startActivity(i);
+            }
 
+        });
+        sms=(Button)findViewById((R.id.sms));
+
+        sms.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+
+
+                //Getting intent and PendingIntent instance
+                Intent intent=new Intent(getApplicationContext(),Select.class);
+                PendingIntent pi=PendingIntent.getActivity(getApplicationContext(), 0, intent,0);
+
+                //Get the SmsManager instance and call the sendTextMessage method to send message
+                SmsManager sms=SmsManager.getDefault();
+                sms.sendTextMessage("9443713612 " +
+                        "", null,"hello", pi,null);
+
+                Toast.makeText(getApplicationContext(), "Message Sent successfully!",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+        route = (Button) findViewById(R.id.rt);
+        route.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse("http://maps.google.com/maps?daddr=8.196300,77.443873"));
+                startActivity(intent);
+            }
+
+        });
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         registered=true;
