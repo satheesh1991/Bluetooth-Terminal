@@ -178,7 +178,9 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
             return;
         }
         // 30 sec no decision
-        if(firstHeartRateEvent + (1000 * 30) < Calendar.getInstance().getTimeInMillis()) {
+        long elapsedTime = Calendar.getInstance().getTimeInMillis() - firstHeartRateEvent;
+        Toast.makeText(this,"Elapsed time "+elapsedTime,Toast.LENGTH_LONG).show();
+        if(  (1000 * 30) < elapsedTime) {
             return;
         }
         if(heartRate > 90 && !isserious ) {
