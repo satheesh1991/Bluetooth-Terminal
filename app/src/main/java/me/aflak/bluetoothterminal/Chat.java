@@ -179,11 +179,11 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
             // critical
             isCritical = true;
             SmsManager sms=SmsManager.getDefault();
-            sms.sendTextMessage("9443713612", null,"your driver is in critical condition ", null,null);
+            sms.sendTextMessage("9489534360", null,"your driver is in critical condition ", null,null);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), "Message Sent successfully!",
+                    Toast.makeText(getApplicationContext(), "Message Sent successfully! Auto pilot mode enabled",
                             Toast.LENGTH_LONG).show();
 
                 }
