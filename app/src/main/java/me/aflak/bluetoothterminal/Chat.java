@@ -29,6 +29,8 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.util.Calendar;
+
 import me.aflak.bluetooth.Bluetooth;
 
 public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCallback {
@@ -168,7 +170,17 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
 
     boolean isserious = false;
     boolean isCritical = false;
+
+    long firstHeartRateEvent = 0;
     void decide(){
+        if(firstHeartRateEvent == 0) {
+            firstHeartRateEvent = Calendar.getInstance().getTimeInMillis();
+            return;
+        }
+        // 30 sec no decision
+        if(firstHeartRateEvent + (1000 * 30) < Calendar.getInstance().getTimeInMillis()) {
+            return;
+        }
         if(heartRate > 90 && !isserious ) {
             // serious
             isserious = true;
@@ -188,7 +200,7 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
 
                 }
             });
-
+            firstHeartRateEvent = 0;
         }
     }
 
