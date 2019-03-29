@@ -29,7 +29,10 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 
 import me.aflak.bluetooth.Bluetooth;
 
@@ -204,6 +207,32 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
             });
             firstHeartRateEvent = 0;
         }
+    }
+
+    boolean decideBasedOnFuzzyCMeansAlgo(int heartrate){
+        int[] serious = new int[]{57,59,60,61,64,95,96,99,100,101,102,103,104,106};
+
+        int[] crtical= new int[]{82,83,84,85,86,87,88,89,90,91,92,93};
+
+        int[] normal = new int[]{50,52,53,54,55,56,75,76,77,78,79,80,81,82,60,61,62,63,64,65,66,67,68,69};
+
+        int sc =  Collections.frequency(Arrays.asList(serious), heartrate);
+        int cc =  Collections.frequency(Arrays.asList(crtical), heartrate);
+        int nc =  Collections.frequency(Arrays.asList(normal), heartrate);
+
+        if(sc > 0){
+            return  true;
+        }
+        if(nc > 0){
+            return false;
+
+        }
+
+        if(cc > 0) {
+            return true
+        }
+
+        return true;
     }
 
     @Override
