@@ -229,7 +229,7 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         }
 
         if(cc > 0) {
-            return true
+            return true;
         }
 
         return true;
